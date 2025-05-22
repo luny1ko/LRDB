@@ -26,6 +26,12 @@ namespace LR_DB
 
         private void BtSave_Click(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(TbRole.Text))
+            {
+                MessageBox.Show("Введите название должности.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             DialogResult = true;
         }
         private void OpenEditWindow()

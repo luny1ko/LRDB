@@ -15,6 +15,9 @@ using System.Windows.Shapes;
 using LR_DB.ViewModel;
 using System.Collections.ObjectModel;
 using System.Net.NetworkInformation;
+using LR_DB.Helper;
+using System.Data;
+using LR_DB.View;
 
 
 namespace LR_DB.View
@@ -24,12 +27,28 @@ namespace LR_DB.View
     /// </summary>
     public partial class WindowRole : Window
     {
-        private RoleViewModel vmRole = new RoleViewModel();
+        private PersonViewModel vmPerson;
+        private RoleViewModel vmRole;  // добавлено поле vmRole
+        private List<Role> roles;
+        private ObservableCollection<PersonDPO> personsDPO;
+
         public WindowRole()
         {
             InitializeComponent();
 
+            vmPerson = new PersonViewModel();
+            vmRole = new RoleViewModel();  // инициализация поля
+            roles = vmRole.ListRole.ToList();
+
+            lvRole.ItemsSource = vmRole.ListRole;
+
+            personsDPO = new ObservableCollection<PersonDPO>();
+            foreach (var person in vmPerson.ListPerson)
+            {
+                personsDPO.Add(PersonDPO.FromPerson(person));
+            }
         }
+
         private void btnAdd_Click(object sender, RoutedEventArgs e)
         {
             WindowNewRole wnRole = new WindowNewRole
@@ -38,18 +57,14 @@ namespace LR_DB.View
                 Owner = this
             };
 
-            int maxIdRole = vmRole.MaxId() + 1;
-            Role role = new Role { Id = maxIdRole };
-
-            wnRole.DataContext = role;
+            Role newRole = new Role();  // создаём новую роль (модель)
+            wnRole.DataContext = newRole;
 
             if (wnRole.ShowDialog() == true)
             {
-                vmRole.ListRole.Add(role);
-                // не нужно обновлять lvRole.ItemsSource, ObservableCollection уведомит сам
+                vmRole.ListRole.Add(newRole); // добавляем в коллекцию ролей
             }
         }
-
         private void btnEdit_Click(object sender, RoutedEventArgs e)
         {
             WindowNewRole wnRole = new WindowNewRole
