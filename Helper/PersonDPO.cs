@@ -2,81 +2,110 @@
 using LR_DB.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace LR_DB.Helper
 {
-    public class PersonDPO
+    /// <summary>
+    /// Класс отображения данных по сотруднику.
+    /// </summary>
+    public class PersonDpo : INotifyPropertyChanged
     {
         public int Id { get; set; }
-        public string Role { get; set; } // Название роли
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public DateTime Birthday { get; set; }
 
-        public PersonDPO() { }
+        private string _roleName;
+        public string Role { get; set; }
 
-        public PersonDPO(int id, string role, string firstName, string lastName, DateTime birthday)
+        public string RoleName
+        {
+            get => _roleName;
+            set => SetProperty(ref _roleName, value);
+        }
+
+        private string _firstName;
+        public string FirstName
+        {
+            get => _firstName;
+            set => SetProperty(ref _firstName, value);
+        }
+
+        private string _lastName;
+        public string LastName
+        {
+            get => _lastName;
+            set => SetProperty(ref _lastName, value);
+        }
+
+        private DateTime _birthday;
+        public DateTime Birthday
+        {
+            get => _birthday;
+            set => SetProperty(ref _birthday, value);
+        }
+
+        public PersonDpo() { }
+
+        public PersonDpo(int id, string roleName, string firstName, string lastName, DateTime birthday)
         {
             Id = id;
-            Role = role;
+            RoleName = roleName;
             FirstName = firstName;
             LastName = lastName;
             Birthday = birthday;
         }
 
-        // Перевод в класс Person (модель БД)
-        public Person ToPerson()
+        public PersonDpo ShallowCopy() => (PersonDpo)MemberwiseClone();
+
+        /// <summary>
+        /// Копирует данные из Person в текущий объект PersonDpo
+        /// </summary>
+        public PersonDpo CopyFromPerson(Person person)
         {
             RoleViewModel vmRole = new RoleViewModel();
-            int roleId = vmRole.ListRole.FirstOrDefault(r => r.NameRole == Role)?.Id ?? 0;
-
-            return new Person
+            string role = vmRole.ListRole.FirstOrDefault(r => r.Id == person.RoleId)?.NameRole ?? string.Empty;
+            if (!string.IsNullOrEmpty(role))
             {
-                Id = Id,
-                RoleId = roleId,
-                FirstName = FirstName,
-                LastName = LastName,
-                Birthday = Birthday
-            };
+                this.Id = person.Id;
+                this.Role = role;
+                this.FirstName = person.FirstName;
+                this.LastName = person.LastName;
+                this.Birthday = person.Birthday;
+            }
+            return this;
         }
 
-        // Перевод из модели Person в DPO
-        public static PersonDPO FromPerson(Person person)
+        public static PersonDpo FromPerson(Person person, RoleViewModel roleViewModel)
         {
-            RoleViewModel vmRole = new RoleViewModel();
-            string roleName = vmRole.ListRole.FirstOrDefault(r => r.Id == person.RoleId)?.NameRole ?? "";
+            var role = roleViewModel.ListRole
+                .FirstOrDefault(r => r.Id == person.RoleId)?.NameRole;
 
-            return new PersonDPO
+            return role == null ? null : new PersonDpo
             {
                 Id = person.Id,
-                Role = roleName,
+                RoleName = role,
                 FirstName = person.FirstName,
                 LastName = person.LastName,
                 Birthday = person.Birthday
             };
         }
-        public PersonDPO ShallowCopy()
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            return (PersonDPO)this.MemberwiseClone();
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        // Копирование данных из Person в DPO
-        public PersonDPO CopyFromPerson(Person person)
+        protected bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string propertyName = "")
         {
-            RoleViewModel vmRole = new RoleViewModel();
-            string roleName = vmRole.ListRole.FirstOrDefault(r => r.Id == person.RoleId)?.NameRole ?? "";
-
-            return new PersonDPO
-            {
-                Id = person.Id,
-                Role = roleName,
-                FirstName = person.FirstName,
-                LastName = person.LastName,
-                Birthday = person.Birthday
-            };
+            if (Equals(storage, value)) return false;
+            storage = value;
+            OnPropertyChanged(propertyName);
+            return true;
         }
     }
 }

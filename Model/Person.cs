@@ -14,9 +14,10 @@ namespace LR_DB.Model
         public int RoleId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+
         public DateTime Birthday { get; set; }
 
-        public Person CopyFromPersonDPO(PersonDPO personDPO)
+        public Person CopyFromPersonDPO(PersonDpo personDPO)
         {
             RoleViewModel vmRole = new RoleViewModel();
             int roleId = vmRole.ListRole.FirstOrDefault(r => r.NameRole == personDPO.Role)?.Id ?? 0;

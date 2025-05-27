@@ -15,6 +15,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Xml.Linq;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace LR_DB.View
@@ -26,7 +27,7 @@ namespace LR_DB.View
     {
         private PersonViewModel vmPerson;
         private RoleViewModel vmRole;
-        private ObservableCollection<PersonDPO> personsDPO;
+        private ObservableCollection<PersonDpo> personsDPO;
         private List<Role> roles;
 
         public WindowEmployee()
@@ -35,16 +36,22 @@ namespace LR_DB.View
             vmPerson = new PersonViewModel();
             vmRole = new RoleViewModel();
             roles = vmRole.ListRole.ToList();
-            personsDPO = new ObservableCollection<PersonDPO>();
+            personsDPO = new ObservableCollection<PersonDpo>();
 
             foreach (var person in vmPerson.ListPerson)
             {
-                PersonDPO p = new PersonDPO();
+                PersonDpo p = new PersonDpo();
                 p = p.CopyFromPerson(person);
                 personsDPO.Add(p);
             }
 
             lvEmployee.ItemsSource = personsDPO;
+            
+            this.Closed += (s, e) =>
+            {
+                DataService.SavePersons(vmPerson.ListPerson);
+                DataService.SaveRoles(vmRole.ListRole);
+            };
         }
 
         private void btnAdd_Click(object sender, RoutedEventArgs e)
@@ -56,7 +63,7 @@ namespace LR_DB.View
             };
 
             int maxIdPerson = vmPerson.MaxId() + 1;
-            PersonDPO per = new PersonDPO { Id = maxIdPerson, Birthday = DateTime.Now };
+            PersonDpo per = new PersonDpo { Id = maxIdPerson, Birthday = DateTime.Now };
 
             wnEmployee.DataContext = per;
             wnEmployee.CbRole.ItemsSource = roles;
@@ -80,10 +87,10 @@ namespace LR_DB.View
                 Owner = this
             };
 
-            PersonDPO perDPO = (PersonDPO)lvEmployee.SelectedValue;
+            PersonDpo perDPO = (PersonDpo)lvEmployee.SelectedValue;
             if (perDPO != null)
             {
-                PersonDPO tempPerDPO = perDPO.ShallowCopy();
+                PersonDpo tempPerDPO = perDPO.ShallowCopy();
                 wnEmployee.DataContext = tempPerDPO;
                 wnEmployee.CbRole.ItemsSource = roles;
                 wnEmployee.CbRole.Text = tempPerDPO.Role;
@@ -112,7 +119,7 @@ namespace LR_DB.View
 
         private void btnDelete_Click(object sender, RoutedEventArgs e)
         {
-            PersonDPO person = (PersonDPO)lvEmployee.SelectedItem;
+            PersonDpo person = (PersonDpo)lvEmployee.SelectedItem;
             if (person != null)
             {
                 MessageBoxResult result = MessageBox.Show("Удалить данные по сотруднику: \n" + person.LastName + " " + person.FirstName, "Предупреждение", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
@@ -128,6 +135,11 @@ namespace LR_DB.View
             {
                 MessageBox.Show("Необходимо выбрать данные по сотруднику для удаления", "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
+            this.Closed += (s, e) =>
+            {
+                DataService.SavePersons(vmPerson.ListPerson);
+                DataService.SaveRoles(vmRole.ListRole);
+            };
         }
     }
 }

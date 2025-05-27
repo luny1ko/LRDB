@@ -30,7 +30,7 @@ namespace LR_DB.View
         private PersonViewModel vmPerson;
         private RoleViewModel vmRole;  // добавлено поле vmRole
         private List<Role> roles;
-        private ObservableCollection<PersonDPO> personsDPO;
+        private ObservableCollection<PersonDpo> personsDpo;
 
         public WindowRole()
         {
@@ -42,27 +42,31 @@ namespace LR_DB.View
 
             lvRole.ItemsSource = vmRole.ListRole;
 
-            personsDPO = new ObservableCollection<PersonDPO>();
+            personsDpo = new ObservableCollection<PersonDpo>();
             foreach (var person in vmPerson.ListPerson)
             {
-                personsDPO.Add(PersonDPO.FromPerson(person));
+                personsDpo.Add(PersonDpo.FromPerson(person, vmRole));
             }
         }
 
         private void btnAdd_Click(object sender, RoutedEventArgs e)
         {
+            Role newRole = new Role
+            {
+                Id = vmRole.MaxId() + 1
+            };
+
             WindowNewRole wnRole = new WindowNewRole
             {
                 Title = "Новая должность",
-                Owner = this
+                Owner = this,
+                DataContext = newRole
             };
-
-            Role newRole = new Role();  // создаём новую роль (модель)
-            wnRole.DataContext = newRole;
 
             if (wnRole.ShowDialog() == true)
             {
-                vmRole.ListRole.Add(newRole); // добавляем в коллекцию ролей
+                vmRole.ListRole.Add(newRole);
+                DataService.SaveRoles(vmRole.ListRole);
             }
         }
         private void btnEdit_Click(object sender, RoutedEventArgs e)
@@ -113,6 +117,10 @@ namespace LR_DB.View
                     MessageBox.Show("Необходимо выбрать должность для удаления",
                      "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
+                this.Closed += (s, e) =>
+                {
+                    DataService.SaveRoles(vmRole.ListRole);
+                };
             }
 
         }
