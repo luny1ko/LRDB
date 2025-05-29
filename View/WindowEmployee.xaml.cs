@@ -17,6 +17,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Xml.Linq;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Microsoft.Win32;
 
 namespace LR_DB.View
 {
@@ -140,6 +141,45 @@ namespace LR_DB.View
                 DataService.SavePersons(vmPerson.ListPerson);
                 DataService.SaveRoles(vmRole.ListRole);
             };
+
+        }
+        private void btnLoad_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Filter = "JSON файлы (*.json)|*.json",
+                Title = "Выберите файл с сотрудниками"
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                var loadedPersons = DataService.LoadPersonsFromFile(openFileDialog.FileName);
+                personsDPO.Clear();
+
+                foreach (var person in loadedPersons)
+                {
+                    PersonDpo dpo = new PersonDpo().CopyFromPerson(person);
+                    personsDPO.Add(dpo);
+                }
+
+                vmPerson.ListPerson = loadedPersons;
+                lvEmployee.ItemsSource = null;
+                lvEmployee.ItemsSource = personsDPO;
+            }
+        }
+
+        private void btnSave_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Filter = "JSON файлы (*.json)|*.json",
+                Title = "Сохранить сотрудников в файл"
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                DataService.SavePersonsToFile(vmPerson.ListPerson, saveFileDialog.FileName);
+            }
         }
     }
 }

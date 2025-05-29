@@ -18,6 +18,7 @@ using System.Net.NetworkInformation;
 using LR_DB.Helper;
 using System.Data;
 using LR_DB.View;
+using Microsoft.Win32;
 
 
 namespace LR_DB.View
@@ -121,8 +122,47 @@ namespace LR_DB.View
                 {
                     DataService.SaveRoles(vmRole.ListRole);
                 };
+
             }
 
+        }
+        private void btnLoad_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Filter = "JSON файлы (*.json)|*.json",
+                Title = "Выберите файл с сотрудниками"
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                var loadedPersons = DataService.LoadPersonsFromFile(openFileDialog.FileName);
+                personsDpo.Clear();
+
+                foreach (var person in loadedPersons)
+                {
+                    PersonDpo dpo = new PersonDpo().CopyFromPerson(person);
+                    personsDpo.Add(dpo);
+                }
+
+                vmPerson.ListPerson = loadedPersons;
+                lvRole.ItemsSource = null;
+                lvRole.ItemsSource = personsDpo;
+            }
+        }
+
+        private void btnSave_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Filter = "JSON файлы (*.json)|*.json",
+                Title = "Сохранить сотрудников в файл"
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                DataService.SaveRolesToFile(vmRole.ListRole, saveFileDialog.FileName);
+            }
         }
     }
 }

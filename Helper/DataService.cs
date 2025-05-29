@@ -36,5 +36,26 @@ namespace LR_DB.Helper
             if (!File.Exists(PersonPath)) return new ObservableCollection<Person>();
             return JsonSerializer.Deserialize<ObservableCollection<Person>>(File.ReadAllText(PersonPath));
         }
+        public static void SavePersonsToFile(ObservableCollection<Person> persons, string path)
+        {
+            File.WriteAllText(path, JsonSerializer.Serialize(persons));
+        }
+
+        public static ObservableCollection<Person> LoadPersonsFromFile(string path)
+        {
+            if (!File.Exists(path)) return new ObservableCollection<Person>();
+            return JsonSerializer.Deserialize<ObservableCollection<Person>>(File.ReadAllText(path));
+        }
+        public static void SaveRolesToFile(ObservableCollection<Role> roles, string path)
+        {
+            File.WriteAllText(path, JsonSerializer.Serialize(roles));
+        }
+
+        public static ObservableCollection<Role> LoadRolesFromFile(string path)
+        {
+            if (!File.Exists(path)) return new ObservableCollection<Role>();
+            return JsonSerializer.Deserialize<ObservableCollection<Role>>(File.ReadAllText(path));
+        }
+
     }
 }
