@@ -71,9 +71,35 @@ namespace LR_DB.View
 
             if (wnEmployee.ShowDialog() == true)
             {
-                Role r = (Role)wnEmployee.CbRole.SelectedValue;
+                Role r = wnEmployee.CbRole.SelectedValue as Role;
+
+                if (r == null)
+                {
+                    MessageBox.Show("Выберите должность!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(per.FirstName))
+                {
+                    MessageBox.Show("Введите имя!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(per.LastName))
+                {
+                    MessageBox.Show("Введите фамилию!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                if (per.Birthday > DateTime.Now)
+                {
+                    MessageBox.Show("Дата рождения не может быть в будущем!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 per.Role = r.NameRole;
                 personsDPO.Add(per);
+
                 Person p = new Person();
                 p = p.CopyFromPersonDPO(per);
                 vmPerson.ListPerson.Add(p);
@@ -98,17 +124,42 @@ namespace LR_DB.View
 
                 if (wnEmployee.ShowDialog() == true)
                 {
-                    Role r = (Role)wnEmployee.CbRole.SelectedValue;
+                    Role r = wnEmployee.CbRole.SelectedValue as Role;
+
+                    if (r == null)
+                    {
+                        MessageBox.Show("Выберите должность!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(tempPerDPO.FirstName))
+                    {
+                        MessageBox.Show("Введите имя!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(tempPerDPO.LastName))
+                    {
+                        MessageBox.Show("Введите фамилию!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    if (tempPerDPO.Birthday > DateTime.Now)
+                    {
+                        MessageBox.Show("Дата рождения не может быть в будущем!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
                     perDPO.Role = r.NameRole;
                     perDPO.FirstName = tempPerDPO.FirstName;
                     perDPO.LastName = tempPerDPO.LastName;
                     perDPO.Birthday = tempPerDPO.Birthday;
+
                     lvEmployee.ItemsSource = null;
                     lvEmployee.ItemsSource = personsDPO;
 
                     FindPerson finder = new FindPerson(perDPO.Id);
                     Person p = vmPerson.ListPerson.FirstOrDefault(person => finder.PersonPredicate(person));
-
                     p = p.CopyFromPersonDPO(perDPO);
                 }
             }
