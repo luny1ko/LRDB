@@ -1,5 +1,4 @@
 ﻿using LR_DB.View;
-using LR_DB.ViewModel;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,7 +17,7 @@ namespace LR_DB
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static PersonViewModel vmPerson = new PersonViewModel();
+        
 
         public MainWindow()
         {
@@ -28,13 +27,13 @@ namespace LR_DB
 
         private void Employee_OnClick(object sender, RoutedEventArgs e)
         {
-            WindowEmployee wEmployee = new WindowEmployee();
-            wEmployee.Show();
+            WindowBooks wBooks = new WindowBooks();
+            wBooks.Show();
         }
 
         private void Role_OnClick(object sender, RoutedEventArgs e)
         {
-            WindowRole wRole = new WindowRole();
+            WindowGenres wRole = new WindowGenres();
             wRole.Show();
         }
 

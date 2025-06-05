@@ -1,0 +1,13 @@
+﻿<Window x:Class="LR_DB.View.WindowGenres"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Жанры" Height="300" Width="400">
+    <Grid Margin="10">
+        <DataGrid x:Name="dgGenres" AutoGenerateColumns="False" IsReadOnly="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="Auto" />
+                <DataGridTextColumn Header="Жанр" Binding="{Binding Name}" Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>

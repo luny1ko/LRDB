@@ -1,4 +1,6 @@
-﻿using System;
+﻿using LR_DB.Helper;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,23 +14,23 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-
 namespace LR_DB.View
 {
-    /// <summary>
-    /// Логика взаимодействия для WindowsNewEmployee.xaml
-    /// </summary>
-    public partial class WindowsNewEmployee : Window
+    public partial class WindowGenres : Window
     {
-        public WindowsNewEmployee()
+        private BookshopDbContext db;
+
+        public WindowGenres()
         {
             InitializeComponent();
+            db = new BookshopDbContext();
+            LoadGenres();
         }
 
-        private void BtSave_Click(object sender, RoutedEventArgs e)
+        private void LoadGenres()
         {
-            DialogResult = true;
+            db.Genres.Load();
+            dgGenres.ItemsSource = db.Genres.Local.ToObservableCollection();
         }
-
     }
 }
